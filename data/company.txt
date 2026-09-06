@@ -1,0 +1,21 @@
+RAGOps is an AI-powered document intelligence system.
+
+The system allows users to upload documents and ask questions about them.
+
+RAGOps uses Retrieval Augmented Generation to answer questions using information retrieved from the user's documents.
+
+Documents are divided into smaller chunks before they are converted into numerical embeddings.
+
+Embeddings represent the semantic meaning of text.
+
+The embeddings are stored in a vector index so that relevant information can be retrieved efficiently.
+
+When a user asks a question, the question is also converted into an embedding.
+
+The system compares the question embedding with document embeddings and retrieves the most relevant chunks.
+
+The retrieved chunks are then provided to the language model as context.
+
+The language model generates an answer based on the retrieved context.
+
+RAGOps is designed with production concerns such as evaluation, observability, security, latency, cost tracking, and deployment.

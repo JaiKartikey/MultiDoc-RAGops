@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What does RAGOps use to represent the semantic meaning of text?",
+    "answer": "Embeddings represent the semantic meaning of text."
+  },
+  {
+    "question": "What does RAGOps use for storing embeddings?",
+    "answer": "The embeddings are stored in a vector index."
+  },
+  {
+    "question": "What happens when a user asks a question?",
+    "answer": "The question is converted into an embedding and compared with document embeddings."
+  },
+  {
+    "question": "What is provided to the language model?",
+    "answer": "The retrieved chunks are provided to the language model as context."
+  },
+  {
+    "question": "What production concerns does RAGOps consider?",
+    "answer": "Evaluation, observability, security, latency, cost tracking, and deployment."
+  }
+]
