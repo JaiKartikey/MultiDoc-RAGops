@@ -12,7 +12,7 @@ def context_Recall(
 )->float:
 
     ground_truth_words = set(
-        ground_truth.lower().split()
+        ground_truth.lower().strip().split()
     )
 
     retrieved_words= set(
@@ -38,7 +38,7 @@ def context_Precision(
         return 0.0
 
     ground_truth_words = set(
-        ground_truth.lower().strip()
+        ground_truth.lower().strip().split()
     )
 
     relevant_chunks:int =0
@@ -46,7 +46,7 @@ def context_Precision(
     for chunk in retrieved_chunks:
 
         chunk_words = set(
-            chunk.lower().strip()
+            chunk.lower().strip().split()
         )
 
         overlap = chunk_words.intersection(

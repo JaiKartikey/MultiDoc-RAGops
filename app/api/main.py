@@ -5,6 +5,8 @@ from app.api.schema import (
 from app.rag.rag_pipeline import ask_question
 from app.rag.main import load_or_create_vector_store
 
+import uuid
+
 from contextlib import asynccontextmanager
 # manage the lifespan of your application, specifically handling startup and shutdown logic.
 # what is lifespan----- everything that happens from the moment your application starts until the moment it shuts down.
@@ -91,30 +93,35 @@ def health_check():
 @app.post("/ask", response_model=AskResponse)
 def ask_endpoint(request: AskRequest):
 
+    request_id = str(uuid.uuid4())
+
     start_time = time.perf_counter() #-----------------------------------  T1
 
     try:
             
-        logger.info("Question Recieved", request.question)
+        logger.info(f"[{request_id}] Question Recieved: {request.question}")
 
-        answer, results = ask_question(
+        answer, results, retrieval_latency, generation_latency = ask_question(
             vector_store,
             request.question
         )
 
         latency = time.perf_counter() - start_time #---------------------------T2
 
-        logger.info(f"The latency is {latency:.2f} seconds")
+        logger.info(f"[{request_id}]The latency is {latency:.2f} seconds")
 
         return{
+            "request_id":request_id,
             "question": request.question,
             "answer": answer,
             "sources": results,
-            "latency": latency
+            "latency": latency,
+            "retrieval_latency": retrieval_latency,
+            "generaion_latency": generation_latency
         }
 
     except Exception as e:
-        logger.error("RAG Request Failed", str(e))
+        logger.error(f"[{request_id}] RAG Request Failed: {str(e)}")
 
         raise HTTPException(
             status_code=500,

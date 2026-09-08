@@ -1,4 +1,5 @@
 import os
+import time
 
 from openai import OpenAI
 
@@ -64,19 +65,42 @@ def ask_question(vector_store, question):
     Answer
     """
 
+# --------------------------------------------------
+    retrieval_start = time.perf_counter()
+
     results = vector_store.search(
         question,
         top_k=settings.top_k
     )
+
+    retrieval_latency = time.perf_counter - retrieval_start
+
+
+    logger.info(
+        f"Retrieval completed in {retrieval_latency:.4f} seconds"
+    )
+
+# --------------------------------------------------
+
 
     context = "\n\n".join(
         result["chunk"]
         for result in results
     )
 
+    generation_start= time.perf_counter
+
     answer = generate_answer(
         question,
         context
     )
 
-    return answer, results
+    generation_latency = time.perf_counter -generation_start
+
+    logger.info(
+        f"Retrieval completed in {retrieval_latency:.4f} seconds"
+    )
+
+# -----------------------------------------------------
+
+    return answer, results, retrieval_latency, generation_latency
