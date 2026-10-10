@@ -58,7 +58,7 @@ def main():
         if question.lower() == "exit":
             break
 
-        answer, results = ask_question(
+        answer, results, ret_lat, gen_lat = ask_question(
             vector_store,
             question
         )

@@ -25,4 +25,13 @@ class Settings(BaseSettings):
         extra = "ignore"
     )
 
-settings = Settings()
+import sys
+from pydantic import ValidationError
+
+try:
+    settings = Settings()
+except ValidationError as e:
+    print("CRITICAL ERROR: Missing required configuration variables.")
+    print("Please ensure GEMINI_API_KEY and GEMINI_API_BASE_URL are set in the environment or .env file.")
+    print(f"Details:\n{e}")
+    sys.exit(1)

@@ -117,7 +117,7 @@ def ask_endpoint(request: AskRequest):
             "sources": results,
             "latency": latency,
             "retrieval_latency": retrieval_latency,
-            "generaion_latency": generation_latency
+            "generation_latency": generation_latency
         }
 
     except Exception as e:

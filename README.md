@@ -929,6 +929,51 @@ The remaining work is focused more on production-oriented concerns such as obser
 
 ---
 
+
+---
+
+# Docker Compose
+
+This project includes a \docker-compose.yml\ to easily run the API with persistent storage.
+
+\\\ash
+docker compose up -d
+\\\
+
+---
+
+# CI/CD & Deployment
+
+This project includes fully configured GitHub Actions workflows for continuous integration and continuous deployment:
+
+1. **\ci.yml\**: Automatically runs on every push and pull request. It checks out the code, sets up Python 3.12, installs dependencies via \uv\, runs \pytest\, and builds the Docker image.
+2. **\publish.yml\**: Automatically builds and pushes the Docker image to GitHub Container Registry (GHCR) on pushes to the \main\ branch.
+
+
+
+## Deploying to Render (or similar PaaS)
+
+This project is perfectly suited for PaaS providers like [Render](https://render.com), Railway, or Fly.io.
+
+Because FAISS writes the vector index to the local filesystem (\/app/storage\), **you must attach a Persistent Disk / Volume** to your container to prevent the RAG index from being rebuilt every time the application restarts.
+
+A \
+ender.yaml\ blueprint is included in the repository for 1-click deployment.
+
+**Steps for Render:**
+1. Connect your GitHub repository to Render.
+2. Create a new **Web Service**.
+3. Select **Docker** as the runtime.
+4. Add a **Disk** mounted at \/app/storage\.
+5. Under Environment Variables, add your \GEMINI_API_KEY\.
+## Cloud Deployment
+
+A simple deployment architecture based on AWS EC2 is intended for this project:
+
+GitHub -> GitHub Actions -> GHCR (Docker Image) -> AWS EC2 instance (docker-compose up -d)
+
+**Note:** The cloud deployment step is fully architected but has not been executed because the AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY) are missing in the current environment. To deploy, simply provision an EC2 instance, install Docker, pull the image from GHCR, and run using the \docker-compose.yml\ provided.
+
 # Roadmap
 
 ## RAG Improvements

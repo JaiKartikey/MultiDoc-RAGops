@@ -73,7 +73,7 @@ def ask_question(vector_store, question):
         top_k=settings.top_k
     )
 
-    retrieval_latency = time.perf_counter - retrieval_start
+    retrieval_latency = time.perf_counter() - retrieval_start
 
 
     logger.info(
@@ -88,17 +88,17 @@ def ask_question(vector_store, question):
         for result in results
     )
 
-    generation_start= time.perf_counter
+    generation_start = time.perf_counter()
 
     answer = generate_answer(
         question,
         context
     )
 
-    generation_latency = time.perf_counter -generation_start
+    generation_latency = time.perf_counter() - generation_start
 
     logger.info(
-        f"Retrieval completed in {retrieval_latency:.4f} seconds"
+        f"Generation completed in {generation_latency:.4f} seconds"
     )
 
 # -----------------------------------------------------

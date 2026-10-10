@@ -16,10 +16,10 @@ class Source(BaseModel):
     score:float
 
 class AskResponse(BaseModel):
-    request_id = str
+    request_id: str
     question: str
     answer: str
-    source: list[Source]
+    sources: list[Source]
     latency: float
     retrieval_latency:float
     generation_latency:float
