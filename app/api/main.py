@@ -72,11 +72,11 @@ app = FastAPI(
 )
 
 
+from fastapi.responses import FileResponse
+
 @app.get("/")
 def home():
-    return{
-        "message":"Welcome to the FastAPI"
-    }
+    return FileResponse("app/static/index.html")
 
 
 @app.get("/health")
