@@ -3,14 +3,10 @@ services:
     name: multidoc-ragops
     env: docker
     region: oregon
-    plan: starter
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: GEMINI_API_KEY
-        sync: false # Must be set manually in the Render Dashboard
+        sync: false # Set your Gemini API key in the Render dashboard
       - key: GEMINI_API_BASE_URL
-        sync: false # Set in dashboard, or default to https://generativelanguage.googleapis.com/v1beta/openai/
-    disk:
-      name: ragops-storage
-      mountPath: /app/storage
-      sizeGB: 1
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
