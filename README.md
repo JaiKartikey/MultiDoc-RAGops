@@ -394,11 +394,11 @@ Used to check whether the application is running.
 POST /upload
 ```
 
-Upload and ingest a `.txt` or `.md` document into the live FAISS vector store.
+Upload and ingest a `.pdf`, `.docx`, `.txt`, `.md`, or `.csv` document into the live FAISS vector store.
 
 Example request (multipart/form-data):
 ```bash
-curl -X POST http://localhost:8000/upload -F "file=@document.txt"
+curl -X POST http://localhost:8000/upload -F "file=@document.pdf"
 ```
 
 Example response:

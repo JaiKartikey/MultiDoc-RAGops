@@ -75,10 +75,45 @@ def test_upload_valid_file(mock_ingest_text):
     assert "Successfully ingested" in data["message"]
 
 
+@patch("app.api.main.ingest_text")
+def test_upload_valid_docx(mock_ingest_text):
+    import io
+    from docx import Document
+    doc = Document()
+    doc.add_paragraph("Architecture overview for multi-document RAG operations.")
+    buf = io.BytesIO()
+    doc.save(buf)
+
+    mock_ingest_text.return_value = 2
+    response = client.post(
+        "/upload",
+        files={"file": ("spec.docx", buf.getvalue(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "spec.docx"
+    assert data["chunks_added"] == 2
+
+
+@patch("app.api.main.extract_text_from_bytes")
+@patch("app.api.main.ingest_text")
+def test_upload_valid_pdf(mock_ingest_text, mock_extract):
+    mock_extract.return_value = "Extracted content from PDF document."
+    mock_ingest_text.return_value = 1
+    response = client.post(
+        "/upload",
+        files={"file": ("paper.pdf", b"%PDF-1.4...", "application/pdf")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "paper.pdf"
+    assert data["chunks_added"] == 1
+
+
 def test_upload_invalid_extension():
     response = client.post(
         "/upload",
-        files={"file": ("report.pdf", b"%PDF-dummy-content", "application/pdf")}
+        files={"file": ("malware.exe", b"MZ...", "application/x-msdownload")}
     )
     assert response.status_code == 400
     assert "Unsupported file format" in response.json()["detail"]

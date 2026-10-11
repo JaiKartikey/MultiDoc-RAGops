@@ -5,7 +5,7 @@ from app.api.schema import (
 )
 from app.rag.rag_pipeline import ask_question
 from app.rag.main import load_or_create_vector_store
-from app.rag.ingest import ingest_text
+from app.rag.ingest import ingest_text, extract_text_from_bytes
 
 import uuid
 
@@ -151,7 +151,7 @@ async def upload_document(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file selected")
 
-    allowed_extensions = {".txt", ".md"}
+    allowed_extensions = {".txt", ".md", ".pdf", ".docx", ".csv"}
     file_ext = Path(file.filename).suffix.lower()
     if file_ext not in allowed_extensions:
         raise HTTPException(
@@ -161,15 +161,15 @@ async def upload_document(file: UploadFile = File(...)):
 
     try:
         content = await file.read()
-        text = content.decode("utf-8")
-    except UnicodeDecodeError:
-        raise HTTPException(status_code=400, detail="File must be a UTF-8 encoded text file.")
+        text = extract_text_from_bytes(content, file.filename)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        logger.error(f"Error reading uploaded file: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to read file.")
+        logger.error(f"Error reading/processing uploaded file '{file.filename}': {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Failed to process file: {str(e)}")
 
     if not text.strip():
-        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+        raise HTTPException(status_code=400, detail="Uploaded file is empty or contains no extractable text.")
 
     try:
         if vector_store is None:

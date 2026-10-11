@@ -216,10 +216,10 @@ fileInput.addEventListener('change', () => {
 });
 
 async function handleUpload(file) {
-    const allowed = ['.txt', '.md'];
+    const allowed = ['.txt', '.md', '.pdf', '.docx', '.csv'];
     const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
     if (!allowed.includes(ext)) {
-        showUploadStatus('error', `✗ Only .txt and .md files are supported.`);
+        showUploadStatus('error', `✗ Unsupported file type. Allowed: PDF, DOCX, TXT, MD, CSV.`);
         return;
     }
 
