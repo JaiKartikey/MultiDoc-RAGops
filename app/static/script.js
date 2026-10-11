@@ -117,18 +117,27 @@ function appendMessage(role, content, sources = [], latency = null) {
 
     let sourcesHTML = '';
     if (isAI && sources && sources.length > 0) {
+        const topScore = (sources[0].score * 100).toFixed(0);
         const chips = sources.map((s, i) => `
             <div class="source-chip">
                 <strong>Source ${i + 1}</strong>
                 <span>${escapeHtml(s.chunk)}</span>
-                <span style="white-space:nowrap;font-size:0.72rem;color:var(--primary);">${(s.score * 100).toFixed(1)}%</span>
+                <span class="source-score">${(s.score * 100).toFixed(1)}%</span>
             </div>
         `).join('');
         sourcesHTML = `
-            <div class="sources">
-                <p class="sources-label">Retrieved Sources</p>
-                ${chips}
-            </div>`;
+            <details class="sources-accordion">
+                <summary class="sources-summary">
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span>Retrieved Sources (${sources.length})</span>
+                    <span class="sources-top-score">Top: ${topScore}% match</span>
+                </summary>
+                <div class="sources-list">
+                    ${chips}
+                </div>
+            </details>`;
     }
 
     let latencyHTML = '';
@@ -146,7 +155,7 @@ function appendMessage(role, content, sources = [], latency = null) {
             <div class="avatar ${avatarClass}">${isUser ? 'You' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>'}</div>
             <div class="bubble">
                 <p class="bubble-name">${senderName}</p>
-                <div class="bubble-content ${isError ? 'error-bubble' : ''}">${isUser ? escapeHtml(content) : content}</div>
+                <div class="bubble-content ${isError ? 'error-bubble' : ''}">${isUser ? escapeHtml(content) : (isError ? escapeHtml(content) : formatMarkdown(content))}</div>
                 ${sourcesHTML}
                 ${latencyHTML}
             </div>
@@ -191,6 +200,18 @@ function escapeHtml(str) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+}
+
+function formatMarkdown(text) {
+    if (!text) return '';
+    let html = escapeHtml(text);
+    // Bold: **text**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Inline code: `code`
+    html = html.replace(/`([^`]+)`/g, '<code style="background:var(--card);padding:2px 5px;border-radius:4px;font-size:0.88em;color:#e2e8f0;">$1</code>');
+    // Bullet lists starting with * or -
+    html = html.replace(/^\s*[\*\-]\s+(.*)$/gim, '• $1');
+    return html;
 }
 
 // ─── File Upload ──────────────────────────────────────────────────────────────
