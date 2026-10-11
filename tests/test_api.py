@@ -11,6 +11,15 @@ def test_home():
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
 
+def test_static_assets():
+    css_res = client.get("/static/style.css")
+    assert css_res.status_code == 200
+    assert "text/css" in css_res.headers["content-type"]
+
+    js_res = client.get("/static/script.js")
+    assert js_res.status_code == 200
+    assert "javascript" in js_res.headers["content-type"]
+
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200

@@ -73,6 +73,9 @@ app = FastAPI(
 
 
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/")
 def home():
