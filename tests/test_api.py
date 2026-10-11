@@ -6,6 +6,15 @@ from app.api.main import app
 
 client = TestClient(app)
 
+@pytest.fixture(autouse=True)
+def mock_vector_store_fixture():
+    mock_vs = MagicMock()
+    mock_vs.chunks = ["chunk1", "chunk2", "chunk3"]
+    with patch("app.api.main.load_or_create_vector_store", return_value=mock_vs):
+        import app.api.main
+        app.api.main.vector_store = mock_vs
+        yield mock_vs
+
 def test_home():
     response = client.get("/")
     assert response.status_code == 200
