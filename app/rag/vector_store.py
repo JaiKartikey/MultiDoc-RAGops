@@ -61,6 +61,29 @@ class VectorStore:
         # index + embeddings
         self.index.add(embeddings)
 
+    def add_chunks(self, new_chunks):
+        if not new_chunks:
+            return 0
+
+        if self.index is None:
+            self.build(new_chunks)
+            return len(new_chunks)
+
+        logger.info("adding embeddings for %d new chunks", len(new_chunks))
+        new_embeddings = []
+        for chunk in new_chunks:
+            embedding = create_embedding(chunk)
+            new_embeddings.append(embedding)
+
+        embeddings = np.array(new_embeddings, dtype="float32")
+        faiss.normalize_L2(embeddings)
+
+        self.index.add(embeddings)
+        self.chunks.extend(new_chunks)
+
+        logger.info("Total chunks in vector store: %d", len(self.chunks))
+        return len(new_chunks)
+
 
 
 

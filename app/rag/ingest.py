@@ -33,3 +33,15 @@ def ingest_document(file_path: str):
     logger.info("Document ingestion complete.")
     return vector_store
 
+
+def ingest_text(text: str, vector_store: VectorStore):
+    """Chunk text, add to vector store, and save."""
+    chunks = chunk_text(text, chunk_size=settings.chunk_size, chunk_overlap=settings.chunk_overlap)
+    if not chunks:
+        return 0
+
+    count = vector_store.add_chunks(chunks)
+    vector_store.save(settings.storage_dir)
+    logger.info("Ingested %d new chunks into vector store.", count)
+    return count
+

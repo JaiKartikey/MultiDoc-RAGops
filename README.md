@@ -377,6 +377,7 @@ Current endpoints:
 GET  /
 GET  /health
 POST /ask
+POST /upload
 ```
 
 ## Health Check
@@ -386,6 +387,29 @@ GET /health
 ```
 
 Used to check whether the application is running.
+
+## Upload & Ingest Document
+
+```http
+POST /upload
+```
+
+Upload and ingest a `.txt` or `.md` document into the live FAISS vector store.
+
+Example request (multipart/form-data):
+```bash
+curl -X POST http://localhost:8000/upload -F "file=@document.txt"
+```
+
+Example response:
+```json
+{
+  "filename": "document.txt",
+  "chunks_added": 4,
+  "total_chunks": 9,
+  "message": "Successfully ingested document.txt (4 chunks added)."
+}
+```
 
 ## Ask a Question
 

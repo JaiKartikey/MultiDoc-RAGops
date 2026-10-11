@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from pathlib import Path
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from app.api.schema import (
-    AskRequest,AskResponse,Source
-    )
+    AskRequest, AskResponse, Source, UploadResponse
+)
 from app.rag.rag_pipeline import ask_question
 from app.rag.main import load_or_create_vector_store
+from app.rag.ingest import ingest_text
 
 import uuid
 
@@ -140,5 +142,50 @@ def ask_endpoint(request: AskRequest):
             status_code=500,
             detail="An error occured"
         )
+
+
+@app.post("/upload", response_model=UploadResponse)
+async def upload_document(file: UploadFile = File(...)):
+    global vector_store
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file selected")
+
+    allowed_extensions = {".txt", ".md"}
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format '{file_ext}'. Allowed formats: {', '.join(sorted(allowed_extensions))}"
+        )
+
+    try:
+        content = await file.read()
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File must be a UTF-8 encoded text file.")
+    except Exception as e:
+        logger.error(f"Error reading uploaded file: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to read file.")
+
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    try:
+        if vector_store is None:
+            vector_store = load_or_create_vector_store()
+
+        chunks_added = ingest_text(text, vector_store)
+        logger.info(f"Ingested '{file.filename}': added {chunks_added} chunks.")
+
+        return {
+            "filename": file.filename,
+            "chunks_added": chunks_added,
+            "total_chunks": len(vector_store.chunks),
+            "message": f"Successfully ingested {file.filename} ({chunks_added} chunks added)."
+        }
+    except Exception as e:
+        logger.error(f"Ingestion failed for {file.filename}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to ingest document: {str(e)}")
 
     

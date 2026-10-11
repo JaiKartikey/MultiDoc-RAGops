@@ -48,3 +48,21 @@ def test_vector_store_save_and_load(tmp_path):
     
     assert vs_loaded.chunks == ["Chunk A", "Chunk B"]
     assert vs_loaded.index.ntotal == 0 # we didn't add any vectors, just testing load
+
+
+@patch("app.rag.vector_store.create_embedding")
+def test_vector_store_add_chunks(mock_create_embedding):
+    mock_create_embedding.side_effect = [
+        np.array([1.0, 0.0, 0.0], dtype="float32"),
+        np.array([0.0, 1.0, 0.0], dtype="float32"),
+        np.array([0.0, 0.0, 1.0], dtype="float32"),
+    ]
+
+    vs = VectorStore()
+    vs.build(["Chunk 1", "Chunk 2"])
+    assert len(vs.chunks) == 2
+
+    count = vs.add_chunks(["Chunk 3"])
+    assert count == 1
+    assert len(vs.chunks) == 3
+    assert vs.chunks[2] == "Chunk 3"

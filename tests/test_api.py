@@ -57,3 +57,37 @@ def test_ask_valid_request(mock_ask_question):
     assert "latency" in data
     assert "retrieval_latency" in data
     assert "generation_latency" in data
+
+
+@patch("app.api.main.ingest_text")
+def test_upload_valid_file(mock_ingest_text):
+    mock_ingest_text.return_value = 3
+    file_content = b"This is a test document with useful knowledge for the RAG pipeline."
+    response = client.post(
+        "/upload",
+        files={"file": ("knowledge.txt", file_content, "text/plain")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "knowledge.txt"
+    assert data["chunks_added"] == 3
+    assert "total_chunks" in data
+    assert "Successfully ingested" in data["message"]
+
+
+def test_upload_invalid_extension():
+    response = client.post(
+        "/upload",
+        files={"file": ("report.pdf", b"%PDF-dummy-content", "application/pdf")}
+    )
+    assert response.status_code == 400
+    assert "Unsupported file format" in response.json()["detail"]
+
+
+def test_upload_empty_file():
+    response = client.post(
+        "/upload",
+        files={"file": ("empty.txt", b"   ", "text/plain")}
+    )
+    assert response.status_code == 400
+    assert "Uploaded file is empty" in response.json()["detail"]

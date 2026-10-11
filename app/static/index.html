@@ -8,9 +8,29 @@
 </head>
 <body>
     <div class="container">
-        <div class="card">
+        <!-- Header -->
+        <div class="card header-card">
             <h1>MultiDoc RAGOps</h1>
-            <p style="color: var(--muted); margin-bottom: 1.5rem;">Ask a question to retrieve answers directly from the ingested knowledge base.</p>
+            <p style="color: var(--muted); margin-bottom: 0;">A production-ready document intelligence system powered by FastAPI, FAISS & Gemini.</p>
+        </div>
+
+        <!-- Upload Document Card -->
+        <div class="card">
+            <h3 style="margin-top: 0;">Upload Document</h3>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.95rem;">
+                Ingest new documents into the live FAISS vector store (.txt or .md files).
+            </p>
+            <form id="upload-form">
+                <input type="file" id="file-input" accept=".txt,.md" required>
+                <button type="submit" id="upload-btn">Upload & Ingest</button>
+            </form>
+            <div id="upload-status" style="display: none; margin-top: 0.75rem;"></div>
+        </div>
+
+        <!-- Ask Question Card -->
+        <div class="card">
+            <h3 style="margin-top: 0;">Ask a Question</h3>
+            <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem;">Retrieve answers directly from your ingested knowledge base.</p>
             
             <form id="ask-form">
                 <input type="text" id="question" placeholder="e.g. What was Acme Corporation's revenue?" required autocomplete="off">
@@ -21,6 +41,7 @@
             <div id="error-message" class="error" style="display: none; margin-top: 1rem;"></div>
         </div>
 
+        <!-- Results Card -->
         <div id="result-container">
             <div class="card">
                 <h3 style="margin-top: 0;">AI Answer</h3>

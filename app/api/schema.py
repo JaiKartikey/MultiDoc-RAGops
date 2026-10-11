@@ -23,3 +23,10 @@ class AskResponse(BaseModel):
     latency: float
     retrieval_latency:float
     generation_latency:float
+
+
+class UploadResponse(BaseModel):
+    filename: str
+    chunks_added: int
+    total_chunks: int
+    message: str
