@@ -135,3 +135,9 @@ def test_upload_empty_file():
     )
     assert response.status_code == 400
     assert "Uploaded file is empty" in response.json()["detail"]
+
+
+def test_clear_knowledge_base():
+    response = client.post("/clear")
+    assert response.status_code == 200
+    assert "cleared successfully" in response.json()["message"]

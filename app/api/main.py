@@ -6,6 +6,8 @@ from app.api.schema import (
 from app.rag.rag_pipeline import ask_question
 from app.rag.main import load_or_create_vector_store
 from app.rag.ingest import ingest_text, extract_text_from_bytes
+from app.rag.vector_store import VectorStore
+from app.core.config import settings
 
 import uuid
 
@@ -101,8 +103,6 @@ def health_check():
     }
 
 
-# using the asynccontextmanager here
-
 
 
 @app.post("/ask", response_model=AskResponse)
@@ -187,5 +187,30 @@ async def upload_document(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Ingestion failed for {file.filename}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to ingest document: {str(e)}")
+
+
+@app.post("/clear")
+def clear_knowledge_base():
+    global vector_store
+    vector_store = VectorStore()
+
+    storage_path = Path(settings.storage_dir)
+    chunks_path = storage_path / "chunks.json"
+    index_path = storage_path / "index.faiss"
+
+    if chunks_path.exists():
+        try:
+            chunks_path.unlink()
+        except Exception:
+            pass
+
+    if index_path.exists():
+        try:
+            index_path.unlink()
+        except Exception:
+            pass
+
+    logger.info("Knowledge base has been cleared.")
+    return {"message": "Knowledge base cleared successfully."}
 
     

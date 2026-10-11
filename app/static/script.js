@@ -52,6 +52,24 @@ newChatBtn.addEventListener('click', () => {
     sendBtn.disabled = true;
 });
 
+// ─── Clear All Documents ──────────────────────────────────────────────────────
+const clearDocsBtn = document.getElementById('clear-docs-btn');
+if (clearDocsBtn) {
+    clearDocsBtn.addEventListener('click', async () => {
+        if (!confirm('Clear all documents from the knowledge base?')) return;
+        try {
+            const res = await fetch('/clear', { method: 'POST' });
+            if (res.ok) {
+                state.documents = [];
+                docList.innerHTML = '<p class="no-docs">No documents uploaded yet.</p>';
+                showUploadStatus('success', '✓ Knowledge base cleared. Upload a document to start fresh.');
+            }
+        } catch (err) {
+            showUploadStatus('error', `✗ Failed to clear: ${err.message}`);
+        }
+    });
+}
+
 // ─── Send question ────────────────────────────────────────────────────────────
 async function handleSend() {
     const question = questionInput.value.trim();

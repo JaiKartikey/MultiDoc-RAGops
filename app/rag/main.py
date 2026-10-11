@@ -31,13 +31,11 @@ def load_or_create_vector_store():
 
         return vector_store
 
-    # If storage does not exist, create it
+    # If storage does not exist, initialize a clean empty vector store
     logger.info("No existing vector store found.")
-    logger.info("Creating new vector store.")
+    logger.info("Initializing new empty vector store (startup auto-load disabled).")
 
-    return ingest_document(
-        "data/company.txt"
-    )
+    return VectorStore()
 
 
 def main():

@@ -83,6 +83,14 @@ def ask_question(vector_store, question):
 # --------------------------------------------------
 
 
+    if not results:
+        return (
+            "No documents have been uploaded to the knowledge base yet. Please upload a document (.pdf, .docx, .txt, .md) using the sidebar to ask questions about it.",
+            [],
+            retrieval_latency,
+            0.0
+        )
+
     context = "\n\n".join(
         result["chunk"]
         for result in results

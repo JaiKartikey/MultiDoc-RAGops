@@ -159,11 +159,9 @@ class VectorStore:
 
     def search(self, query, top_k =5):
 
-        #edge cases
-        if self.index is None:
-            raise ValueError("Vector store is empty. Please build the index first.")
-
-        if not self.chunks:
+        #edge cases: empty store
+        if self.index is None or not self.chunks:
+            logger.info("Search requested but vector store is empty.")
             return []
 
         # -----------------------------------------

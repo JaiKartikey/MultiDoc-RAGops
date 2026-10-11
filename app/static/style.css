@@ -81,13 +81,37 @@ body {
     border-bottom: 1px solid var(--border);
 }
 
+.sidebar-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
 .sidebar-label {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
-    margin-bottom: 10px;
     font-weight: 600;
+}
+
+.clear-docs-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.clear-docs-btn:hover {
+    color: #f87171;
+    border-color: #f87171;
+    background: rgba(239, 68, 68, 0.08);
 }
 
 /* Upload Zone */
