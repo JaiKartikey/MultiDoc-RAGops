@@ -82,6 +82,16 @@ def home():
     return FileResponse("app/static/index.html")
 
 
+@app.get("/style.css")
+def get_style():
+    return FileResponse("app/static/style.css")
+
+
+@app.get("/script.js")
+def get_script():
+    return FileResponse("app/static/script.js")
+
+
 @app.get("/health")
 def health_check():
     return{
