@@ -7,59 +7,96 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="card header-card">
-            <h1>MultiDoc RAGOps</h1>
-            <p style="color: var(--muted); margin-bottom: 0;">A production-ready document intelligence system powered by FastAPI, FAISS & Gemini.</p>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <span>MultiDoc RAGOps</span>
+            </div>
+            <button class="new-chat-btn" id="new-chat-btn" title="New Chat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+            </button>
         </div>
 
-        <!-- Upload Document Card -->
-        <div class="card">
-            <h3 style="margin-top: 0;">Upload Document</h3>
-            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.95rem;">
-                Ingest new documents into the live FAISS vector store (.txt or .md files).
-            </p>
-            <form id="upload-form">
-                <input type="file" id="file-input" accept=".txt,.md" required>
-                <button type="submit" id="upload-btn">Upload & Ingest</button>
-            </form>
-            <div id="upload-status" style="display: none; margin-top: 0.75rem;"></div>
+        <!-- Upload Section -->
+        <div class="sidebar-section">
+            <p class="sidebar-label">Knowledge Base</p>
+            <div class="upload-zone" id="upload-zone">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="16 16 12 12 8 16"/>
+                    <line x1="12" y1="12" x2="12" y2="21"/>
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                </svg>
+                <p>Drop a file or <label for="file-input" class="upload-link">browse</label></p>
+                <p class="upload-hint">.txt or .md files only</p>
+                <input type="file" id="file-input" accept=".txt,.md" hidden>
+            </div>
+            <div id="upload-status" class="upload-status" style="display:none;"></div>
         </div>
 
-        <!-- Ask Question Card -->
-        <div class="card">
-            <h3 style="margin-top: 0;">Ask a Question</h3>
-            <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem;">Retrieve answers directly from your ingested knowledge base.</p>
-            
-            <form id="ask-form">
-                <input type="text" id="question" placeholder="e.g. What was Acme Corporation's revenue?" required autocomplete="off">
-                <button type="submit" id="submit-btn">Ask</button>
-            </form>
-            
-            <div id="loading">Searching documents and generating answer...</div>
-            <div id="error-message" class="error" style="display: none; margin-top: 1rem;"></div>
-        </div>
-
-        <!-- Results Card -->
-        <div id="result-container">
-            <div class="card">
-                <h3 style="margin-top: 0;">AI Answer</h3>
-                <div class="answer-box">
-                    <p id="answer-text"></p>
-                </div>
-                
-                <h3>Retrieved Sources</h3>
-                <div id="sources-list"></div>
-
-                <div class="metrics">
-                    <div>Total Latency: <span id="latency" class="metric-value"></span>s</div>
-                    <div>Retrieval: <span id="retrieval-latency" class="metric-value"></span>s</div>
-                    <div>Generation: <span id="generation-latency" class="metric-value"></span>s</div>
-                </div>
+        <!-- Documents List -->
+        <div class="sidebar-section">
+            <p class="sidebar-label">Uploaded Documents</p>
+            <div id="doc-list" class="doc-list">
+                <p class="no-docs">No documents uploaded yet.</p>
             </div>
         </div>
-    </div>
+
+        <div class="sidebar-footer">
+            <span>Powered by Gemini + FAISS</span>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT AREA -->
+    <main class="chat-main">
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+            <div class="empty-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <h2>Ask your documents anything</h2>
+            <p>Upload a document on the left, then ask a question below.</p>
+            <div class="suggestion-chips">
+                <button class="chip" data-q="What is this document about?">What is this document about?</button>
+                <button class="chip" data-q="Summarize the key points.">Summarize the key points.</button>
+                <button class="chip" data-q="What are the main findings?">What are the main findings?</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages" id="messages"></div>
+
+        <!-- Input Bar -->
+        <div class="input-bar-wrapper">
+            <div class="input-bar">
+                <textarea
+                    id="question-input"
+                    placeholder="Ask a question about your documents…"
+                    rows="1"
+                    maxlength="2000"
+                ></textarea>
+                <button class="send-btn" id="send-btn" disabled title="Send">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="disclaimer">RAGOps answers based only on ingested documents.</p>
+        </div>
+    </main>
 
     <script src="script.js" defer></script>
 </body>
